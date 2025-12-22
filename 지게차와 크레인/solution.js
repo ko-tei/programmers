@@ -1,18 +1,20 @@
 function solution(storage, requests) {
-    let newStorage = storage.map(row => row.split(""));
-    const cols = newStorage[0].length;
-    const rows = newStorage.length;
+    const cols = storage[0].length;
+    const rows = storage.length;
+    const total = cols * rows;
+
+    const remove = new Set();
 
     const findRoute = (x, y, req, route) => {
         const key = `${x},${y}`;
         if (route.has(key)) return;
         route.add(key);
 
-        const current = newStorage[y][x];
+        const current = storage[y][x];
 
-        if (current === req) {
-            newStorage[y][x] = "1";
-        } else if (current === "0") {
+        if (current === req && !remove.has(key)) {
+            remove.add(key);
+        } else if (remove.has(key)) {
             if (x + 1 < cols) findRoute(x + 1, y, req, route);
             if (x - 1 >= 0) findRoute(x - 1, y, req, route);
             if (y + 1 < rows) findRoute(x, y + 1, req, route);
@@ -25,8 +27,9 @@ function solution(storage, requests) {
         if (req.length > 1) {
             for (let y = 0; y < rows; y++) {
                 for (let x = 0; x < cols; x++) {
-                    if (newStorage[y][x] === t) {
-                        newStorage[y][x] = "0";
+                    const key = `${x},${y}`;
+                    if (!remove.has(key) && storage[y][x] === t) {
+                        remove.add(key);
                     }
                 }
             }
@@ -53,15 +56,7 @@ function solution(storage, requests) {
                 }
             }
         }
-
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                if (newStorage[y][x] === "1") {
-                    newStorage[y][x] = "0";
-                }
-            }
-        }
     }
 
-    return newStorage.reduce((acc, cur) => acc + cur.filter(ch => ch !== "0").length, 0);
+    return total - remove.size;
 }
