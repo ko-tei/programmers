@@ -3,8 +3,9 @@ function solution(storage, requests) {
     const rows = storage.length;
 
     const findRoute = (x, y, req, route) => {
-        if (route.includes(`${x},${y}`)) return;
-        route.push(`${x},${y}`);
+        const key = `${x},${y}`;
+        if (route.has(key)) return;
+        route.add(key);
 
         const current = storage[y][x];
 
@@ -27,7 +28,7 @@ function solution(storage, requests) {
             let x = 0;
             let y = 0;
 
-            const route = [];
+            const route = new Set();
 
             while (count !== total) {
                 findRoute(x, y, req, route);
